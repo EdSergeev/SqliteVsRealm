@@ -18,15 +18,16 @@ public class SqliteProviderTest extends AndroidTestCase {
         super.setUp();
 
         provider = new SqliteProvider();
-        provider.open(getContext());
+        provider.init(getContext());
+        provider.open();
     }
 
     public void testInserts() {
         provider.begin();
         long id;
-        id = provider.insert(new Group("Group 1"));
+        id = provider.insert(new Group(0, "Group 1"));
         Assert.assertFalse(id == 0);
-        id = provider.insert(new Student("student 1", 55, id));
+        id = provider.insert(new Student(1, "student 1", 55, id));
         Assert.assertFalse(id == 0);
         provider.commit();
     }
