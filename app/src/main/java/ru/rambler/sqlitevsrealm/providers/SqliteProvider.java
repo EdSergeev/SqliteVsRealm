@@ -14,6 +14,11 @@ public class SqliteProvider implements DbProvider {
     private SQLiteDatabase db;
 
     @Override
+    public String getName() {
+        return "Sqlite";
+    }
+
+    @Override
     public void open(Context context) {
         helper = new SqliteHelper(context);
         db = helper.getWritableDatabase();
@@ -22,7 +27,17 @@ public class SqliteProvider implements DbProvider {
     @Override
     public void close() {
         db = null;
-        helper.close();
+        if (helper != null) {
+            helper.close();
+        }
+    }
+
+    @Override
+    public void clean() {
+        begin();
+        db.execSQL("DELETE FROM " + SqliteHelper.Tables.Students);
+        db.execSQL("DELETE FROM " + SqliteHelper.Tables.Groups);
+        commit();
     }
 
     @Override
