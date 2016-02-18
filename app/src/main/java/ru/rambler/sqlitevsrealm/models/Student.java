@@ -6,18 +6,11 @@ public class Student {
     private long groupId;
     private int averageScore;
 
-    public Student() {
-    }
-
     public Student(long id, String name, int averageScore, long groupId) {
         this.averageScore = averageScore;
         this.groupId = groupId;
         this.id = id;
         this.name = name;
-    }
-
-    public Student(String name, int averageScore, long groupId) {
-        this(0, name, averageScore, groupId);
     }
 
     public int getAverageScore() {

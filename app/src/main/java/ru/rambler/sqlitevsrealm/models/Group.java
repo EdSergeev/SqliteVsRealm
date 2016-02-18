@@ -9,13 +9,6 @@ public class Group {
         this.title = title;
     }
 
-    public Group(String title) {
-        this.title = title;
-    }
-
-    public Group() {
-    }
-
     public long getGroupId() {
         return groupId;
     }

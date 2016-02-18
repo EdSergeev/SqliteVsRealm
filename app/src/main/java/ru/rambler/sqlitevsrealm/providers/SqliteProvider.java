@@ -2,6 +2,7 @@ package ru.rambler.sqlitevsrealm.providers;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import ru.rambler.sqlitevsrealm.models.Group;
@@ -19,8 +20,12 @@ public class SqliteProvider implements DbProvider {
     }
 
     @Override
-    public void open(Context context) {
+    public void init(Context context) {
         helper = new SqliteHelper(context);
+    }
+
+    @Override
+    public void open() {
         db = helper.getWritableDatabase();
     }
 
@@ -65,5 +70,16 @@ public class SqliteProvider implements DbProvider {
         ContentValues value = new ContentValues(1);
         value.put("title", group.getTitle());
         return db.insert(SqliteHelper.Tables.Groups, null, value);
+    }
+
+    @Override
+    public long selectStudentsByGroupId(long groupId) {
+        Cursor c = db.rawQuery("SELECT * FROM " + SqliteHelper.Tables.Students + " WHERE group_id = " + groupId, null);
+        while (c.moveToNext()) {
+            c.getLong(0);
+        }
+        int result = c.getCount();
+        c.close();
+        return result;
     }
 }

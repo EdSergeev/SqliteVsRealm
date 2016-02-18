@@ -8,7 +8,9 @@ import ru.rambler.sqlitevsrealm.models.Student;
 public interface DbProvider {
     String getName();
 
-    void open(Context context);
+    void init(Context context);
+
+    void open();
 
     void close();
 
@@ -21,4 +23,6 @@ public interface DbProvider {
     long insert(Student student);
 
     long insert(Group group);
+
+    long selectStudentsByGroupId(long groupId);
 }

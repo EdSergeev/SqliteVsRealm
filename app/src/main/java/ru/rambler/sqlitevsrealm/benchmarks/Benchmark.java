@@ -47,9 +47,15 @@ public abstract class Benchmark {
                 if (isCancelled()) {
                     break;
                 }
-                long spentTime = runTest(provider);
-                Log.d(TAG, "Provider '" + provider.getName() + "' spent " + spentTime + "ms");
-                results.put(provider.getName(), spentTime);
+                provider.open();
+                try {
+                    BaseTest test = createTest(provider);
+                    long spentTime = runTest(test);
+                    results.put(provider.getName(), spentTime);
+                    Log.d(TAG, test.getTestName() + ": Provider '" + provider.getName() + "' spent " + spentTime + "ms");
+                } finally {
+                    provider.close();
+                }
             }
             return results;
         }
@@ -59,9 +65,9 @@ public abstract class Benchmark {
 
         }
 
-        private long runTest(DbProvider provider) {
+        private long runTest(BaseTest test) {
             long startTime = System.currentTimeMillis();
-            createTest(provider).run();
+            test.run();
             return System.currentTimeMillis() - startTime;
         }
     }
