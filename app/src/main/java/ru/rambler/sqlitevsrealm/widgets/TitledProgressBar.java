@@ -28,7 +28,7 @@ public class TitledProgressBar extends FrameLayout {
     }
 
     private void init() {
-        inflate(getContext(), R.layout.list_items_score, this);
+        inflate(getContext(), R.layout.titled_progess_bar, this);
         titleView = (TextView) findViewById(R.id.title);
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
     }

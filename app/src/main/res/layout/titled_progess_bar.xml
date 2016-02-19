@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginTop="5dp"
     android:orientation="vertical">
 
     <ProgressBar
@@ -11,13 +12,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:max="100"
-        android:progress="3" />
+        android:progress="66"
+        android:progressDrawable="@drawable/progress_bar" />
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:gravity="left|center_vertical"
-        tools:text="Sqlite"
-        android:textColor="#fff" />
+        android:layout_marginLeft="3dp"
+        android:layout_marginStart="3dp"
+        android:gravity="center_vertical"
+        android:textColor="#fcfcfc"
+        tools:text="Sqlite" />
 </FrameLayout>
