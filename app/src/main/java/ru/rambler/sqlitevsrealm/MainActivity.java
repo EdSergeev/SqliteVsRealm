@@ -2,12 +2,14 @@ package ru.rambler.sqlitevsrealm;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import ru.rambler.sqlitevsrealm.benchmarks.Benchmark;
 import ru.rambler.sqlitevsrealm.providers.DbProvider;
@@ -39,35 +41,62 @@ public class MainActivity extends AppCompatActivity {
             provider.close();
         }
 
-        new Benchmark(providers) {
+        new Benchmark(providers, benchmarkCallback) {
             @Override
             protected BaseTest createTest(DbProvider provider) {
                 return new InsertionTest(provider);
             }
+
+            @Override
+            protected String getBenchmarkName() {
+                return "Insertion";
+            }
         }.begin();
 
-        new Benchmark(providers) {
+        new Benchmark(providers, benchmarkCallback) {
             @Override
             protected BaseTest createTest(DbProvider provider) {
                 return new SelectByGroupIdTest(provider);
             }
+
+            @Override
+            protected String getBenchmarkName() {
+                return "Selection";
+            }
         }.begin();
-
-        addBenchmarkResult("Insertion");
-        addResult("Sqlite: 4353ms", 79, 100);
-        addResult("Realm: 3353ms", 69, 100);
     }
 
-    private void addBenchmarkResult(String benchmarkTitle) {
-        View view = View.inflate(this, R.layout.benchark_title, container);
-        ((TextView) view.findViewById(R.id.title)).setText(benchmarkTitle);
+    private final Benchmark.Callback benchmarkCallback = new Benchmark.Callback() {
+        @Override
+        public void postResults(String benchmarkName, Map<String, Long> results) {
+            addBenchmarkNameView(benchmarkName);
+            if (results.isEmpty()) {
+                return;
+            }
+            long maxScore = 0;
+            long sum = 0;
+            for (long score : results.values()) {
+                maxScore = Math.max(maxScore, score);
+                sum += score;
+            }
+            long maxValue = maxScore + sum / results.size();
+            for (Map.Entry<String, Long> result : results.entrySet()) {
+                addScoreView(result.getKey(), result.getValue().intValue(), (int) maxValue);
+            }
+        }
+    };
+
+    private void addBenchmarkNameView(String benchmarkName) {
+        View view = LayoutInflater.from(this).inflate(R.layout.benchark_title, container, false);
+        ((TextView) view.findViewById(R.id.title)).setText(benchmarkName);
+        container.addView(view);
     }
 
-    private void addResult(String title, int score, int max) {
+    private void addScoreView(String title, int score, int max) {
         TitledProgressBar resultBar = new TitledProgressBar(this);
-        resultBar.setProgress(score);
         resultBar.setMax(max);
-        resultBar.setTitle(title);
+        resultBar.setProgress(score);
+        resultBar.setTitle(title + ": " + score + "ms");
         container.addView(resultBar);
     }
 }
