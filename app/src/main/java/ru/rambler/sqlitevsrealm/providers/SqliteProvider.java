@@ -74,9 +74,35 @@ public class SqliteProvider implements DbProvider {
 
     @Override
     public long selectStudentsByGroupId(long groupId) {
-        Cursor c = db.rawQuery("SELECT * FROM " + SqliteHelper.Tables.Students + " WHERE group_id = " + groupId, null);
-        while (c.moveToNext()) {
-            c.getLong(0);
+        return iterateStudentCursor("SELECT * FROM " + SqliteHelper.Tables.Students + " WHERE group_id = " + groupId);
+    }
+
+    @Override
+    public long selectStudentsByGroupIdAndSort(long groupId) {
+        return iterateStudentCursor("SELECT * FROM " + SqliteHelper.Tables.Students + " WHERE group_id = " + groupId + " ORDER BY average_score DESC");
+    }
+
+    @Override
+    public long selectStudentsBetween(int fromScore, int toScore) {
+        return iterateStudentCursor("SELECT * FROM " + SqliteHelper.Tables.Students + " WHERE average_score BETWEEN " + fromScore + " AND " + toScore);
+    }
+
+
+    private int iterateStudentCursor(String sql) {
+        Cursor c = db.rawQuery(sql, null);
+        if (c.moveToFirst()) {
+            int col_id = c.getColumnIndex("id");
+            int col_name = c.getColumnIndex("name");
+            int col_score = c.getColumnIndex("average_score");
+            int col_group_id = c.getColumnIndex("group_id");
+
+            do {
+                c.getLong(col_id);
+                c.getLong(col_group_id);
+                c.getString(col_name);
+                c.getInt(col_score);
+            }
+            while (c.moveToNext());
         }
         int result = c.getCount();
         c.close();

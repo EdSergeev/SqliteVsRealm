@@ -20,6 +20,8 @@ import ru.rambler.sqlitevsrealm.tests.BaseTest;
 import ru.rambler.sqlitevsrealm.tests.Config;
 import ru.rambler.sqlitevsrealm.tests.DeleteGroupTest;
 import ru.rambler.sqlitevsrealm.tests.InsertionTest;
+import ru.rambler.sqlitevsrealm.tests.SelectBetweenTest;
+import ru.rambler.sqlitevsrealm.tests.SelectGroupSortedTest;
 import ru.rambler.sqlitevsrealm.tests.SelectGroupTest;
 import ru.rambler.sqlitevsrealm.widgets.TitledProgressBar;
 
@@ -67,14 +69,28 @@ public class MainActivity extends AppCompatActivity {
             }
         }.begin();
 
-        new Benchmark("Select students by groupId", providers, benchmarkCallback) {
+        new Benchmark("Select students using 'groupId'", providers, benchmarkCallback) {
             @Override
             protected BaseTest createTest(DbProvider provider) {
                 return new SelectGroupTest(provider);
             }
         }.begin();
 
-        new Benchmark("Delete students by groupId", providers, benchmarkCallback) {
+        new Benchmark("Select students using 'groupId' and sort", providers, benchmarkCallback) {
+            @Override
+            protected BaseTest createTest(DbProvider provider) {
+                return new SelectGroupSortedTest(provider);
+            }
+        }.begin();
+
+        new Benchmark("Select students using 'between (m,n)'", providers, benchmarkCallback) {
+            @Override
+            protected BaseTest createTest(DbProvider provider) {
+                return new SelectBetweenTest(provider);
+            }
+        }.begin();
+
+        new Benchmark("Delete students using groupId", providers, benchmarkCallback) {
             @Override
             protected BaseTest createTest(DbProvider provider) {
                 return new DeleteGroupTest(provider);

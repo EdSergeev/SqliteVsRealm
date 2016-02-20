@@ -26,5 +26,9 @@ public interface DbProvider {
 
     long selectStudentsByGroupId(long groupId);
 
+    long selectStudentsByGroupIdAndSort(long groupId);
+
+    long selectStudentsBetween(int fromScore, int toScore);
+
     long deleteGroup(long groupId);
 }

@@ -5,6 +5,7 @@ import android.content.Context;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.RealmResults;
+import io.realm.Sort;
 import ru.rambler.sqlitevsrealm.models.Group;
 import ru.rambler.sqlitevsrealm.models.Student;
 import ru.rambler.sqlitevsrealm.providers.realm.RealmGroup;
@@ -12,16 +13,14 @@ import ru.rambler.sqlitevsrealm.providers.realm.RealmStudent;
 
 public class RealmProvider implements DbProvider {
     private Realm realm;
-    private Context context;
 
     @Override
     public String getName() {
-        return "realm";
+        return "Realm";
     }
 
     @Override
     public void init(Context context) {
-        this.context = context;
         Realm.setDefaultConfiguration(new RealmConfiguration.Builder(context)
                 .deleteRealmIfMigrationNeeded()
                 .build());
@@ -60,9 +59,6 @@ public class RealmProvider implements DbProvider {
 
     @Override
     public long insert(Student student) {
-//        RealmStudent item = new RealmStudent(student.getId(), student.getName(), student.getAverageScore(), student.getGroupId());
-//        return realm.copyToRealm(item).getId();
-
         RealmStudent item = realm.createObject(RealmStudent.class);
         item.setId(student.getId());
         item.setAverageScore(student.getAverageScore());
@@ -79,11 +75,36 @@ public class RealmProvider implements DbProvider {
 
     @Override
     public long selectStudentsByGroupId(long groupId) {
-        RealmResults<RealmStudent> list = realm.where(RealmStudent.class).equalTo("groupId", groupId).findAll();
+        RealmResults<RealmStudent> list = realm.where(RealmStudent.class)
+                .equalTo("groupId", groupId)
+                .findAll();
+        iterateStudents(list);
+        return list.size();
+    }
+
+    @Override
+    public long selectStudentsByGroupIdAndSort(long groupId) {
+        RealmResults<RealmStudent> list = realm.where(RealmStudent.class)
+                .equalTo("groupId", groupId)
+                .findAllSorted("averageScore", Sort.DESCENDING);
+        iterateStudents(list);
+        return list.size();
+    }
+
+    @Override
+    public long selectStudentsBetween(int fromScore, int toScore) {
+        RealmResults<RealmStudent> list = realm.where(RealmStudent.class).between("averageScore", fromScore, toScore).findAll();
+        iterateStudents(list);
+        return list.size();
+    }
+
+    private void iterateStudents(RealmResults<RealmStudent> list) {
         for (RealmStudent student : list) {
             student.getId();
+            student.getName();
+            student.getAverageScore();
+            student.getGroupId();
         }
-        return list.size();
     }
 
     @Override
