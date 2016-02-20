@@ -16,6 +16,4 @@ public abstract class BaseTest implements Runnable {
     }
 
     protected abstract void work(DbProvider provider);
-
-    public abstract String getTestName();
 }

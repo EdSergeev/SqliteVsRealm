@@ -1,6 +1,7 @@
 package ru.rambler.sqlitevsrealm;
 
 import android.os.Bundle;
+import android.support.v4.widget.ContentLoadingProgressBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,19 +17,23 @@ import ru.rambler.sqlitevsrealm.providers.DbProvider;
 import ru.rambler.sqlitevsrealm.providers.RealmProvider;
 import ru.rambler.sqlitevsrealm.providers.SqliteProvider;
 import ru.rambler.sqlitevsrealm.tests.BaseTest;
+import ru.rambler.sqlitevsrealm.tests.Config;
+import ru.rambler.sqlitevsrealm.tests.DeleteGroupTest;
 import ru.rambler.sqlitevsrealm.tests.InsertionTest;
-import ru.rambler.sqlitevsrealm.tests.SelectByGroupIdTest;
+import ru.rambler.sqlitevsrealm.tests.SelectGroupTest;
 import ru.rambler.sqlitevsrealm.widgets.TitledProgressBar;
 
 public class MainActivity extends AppCompatActivity {
 
     private LinearLayout container;
+    private ContentLoadingProgressBar progress;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         container = (LinearLayout) findViewById(R.id.content);
+        progress = (ContentLoadingProgressBar) findViewById(R.id.progress);
 
         List<DbProvider> providers = new ArrayList<DbProvider>() {{
             add(new RealmProvider());
@@ -41,32 +46,35 @@ public class MainActivity extends AppCompatActivity {
             provider.close();
         }
 
-        new Benchmark(providers, benchmarkCallback) {
+        String insertName = String.format("Insert %d items", Config.GROUPS * Config.STUDENTS_PER_GROUP);
+        new Benchmark(insertName, providers, benchmarkCallback) {
             @Override
             protected BaseTest createTest(DbProvider provider) {
                 return new InsertionTest(provider);
             }
+        }.begin();
 
+        new Benchmark("Select students by groupId", providers, benchmarkCallback) {
             @Override
-            protected String getBenchmarkName() {
-                return "Insertion";
+            protected BaseTest createTest(DbProvider provider) {
+                return new SelectGroupTest(provider);
             }
         }.begin();
 
-        new Benchmark(providers, benchmarkCallback) {
+        new Benchmark("Delete students by groupId", providers, benchmarkCallback) {
             @Override
             protected BaseTest createTest(DbProvider provider) {
-                return new SelectByGroupIdTest(provider);
-            }
-
-            @Override
-            protected String getBenchmarkName() {
-                return "Selection";
+                return new DeleteGroupTest(provider);
             }
         }.begin();
     }
 
     private final Benchmark.Callback benchmarkCallback = new Benchmark.Callback() {
+        @Override
+        public void begin() {
+            progress.show();
+        }
+
         @Override
         public void postResults(String benchmarkName, Map<String, Long> results) {
             addBenchmarkNameView(benchmarkName);
@@ -79,10 +87,11 @@ public class MainActivity extends AppCompatActivity {
                 maxScore = Math.max(maxScore, score);
                 sum += score;
             }
-            long maxValue = maxScore + sum / results.size();
+            double maxValue = maxScore + (sum / results.size()) * 0.5;
             for (Map.Entry<String, Long> result : results.entrySet()) {
                 addScoreView(result.getKey(), result.getValue().intValue(), (int) maxValue);
             }
+            progress.hide();
         }
     };
 

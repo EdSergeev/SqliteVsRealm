@@ -82,4 +82,11 @@ public class SqliteProvider implements DbProvider {
         c.close();
         return result;
     }
+
+    @Override
+    public long deleteGroup(long groupId) {
+        db.execSQL("DELETE FROM " + SqliteHelper.Tables.Students + " WHERE group_id = " + groupId);
+        db.execSQL("DELETE FROM " + SqliteHelper.Tables.Groups + " WHERE group_id = " + groupId);
+        return 0;
+    }
 }

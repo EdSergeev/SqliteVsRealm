@@ -25,4 +25,6 @@ public interface DbProvider {
     long insert(Group group);
 
     long selectStudentsByGroupId(long groupId);
+
+    long deleteGroup(long groupId);
 }

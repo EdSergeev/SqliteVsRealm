@@ -9,7 +9,7 @@ import android.util.Log;
 public class SqliteHelper extends SQLiteOpenHelper {
     private static final String TAG = SqliteHelper.class.getSimpleName();
     private static final String DB_NAME = "sqlitedb.db";
-    private static final int DB_VERSION = 1;
+    private static final int DB_VERSION = 3;
 
 
     public interface Tables {
@@ -27,7 +27,7 @@ public class SqliteHelper extends SQLiteOpenHelper {
 
         try {
             db.execSQL("CREATE TABLE " + Tables.Groups + " (group_id INTEGER PRIMARY KEY, title TEXT NOT NULL)");
-            db.execSQL("CREATE TABLE " + Tables.Students + " (id INTEGER PRIMARY KEY, name TEXT NOT NULL, average_score INT, group_id INT NOT NULL, FOREIGN KEY(group_id) REFERENCES " + Tables.Groups + "(group_id))");
+            db.execSQL("CREATE TABLE " + Tables.Students + " (id INTEGER PRIMARY KEY, name TEXT NOT NULL, average_score INT, group_id INT NOT NULL)");
 
             db.setTransactionSuccessful();
         } catch (SQLiteException e) {

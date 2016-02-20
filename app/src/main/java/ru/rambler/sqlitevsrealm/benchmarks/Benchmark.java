@@ -17,17 +17,19 @@ public abstract class Benchmark {
     private static final String TAG = Benchmark.class.getSimpleName();
     private static Executor executor = Executors.newSingleThreadExecutor();
     private final List<DbProvider> providerList;
+    private final String benchmarkName;
     private final Callback callback;
     private TaskRunner task;
 
-    public Benchmark(@NonNull List<DbProvider> providerList, @NonNull Callback callback) {
+    public Benchmark(@NonNull String benchmarkName,
+                     @NonNull List<DbProvider> providerList,
+                     @NonNull Callback callback) {
+        this.benchmarkName = benchmarkName;
         this.providerList = providerList;
         this.callback = callback;
     }
 
     protected abstract BaseTest createTest(DbProvider provider);
-
-    protected abstract String getBenchmarkName();
 
     public void begin() {
         cancel();
@@ -45,6 +47,11 @@ public abstract class Benchmark {
     private class TaskRunner extends AsyncTask<Void, Void, Map<String, Long>> {
 
         @Override
+        protected void onPreExecute() {
+            callback.begin();
+        }
+
+        @Override
         protected Map<String, Long> doInBackground(Void... params) {
             Map<String, Long> results = new HashMap<>(providerList.size());
             for (DbProvider provider : providerList) {
@@ -56,7 +63,7 @@ public abstract class Benchmark {
                     BaseTest test = createTest(provider);
                     long spentTime = runTest(test);
                     results.put(provider.getName(), spentTime);
-                    Log.d(TAG, test.getTestName() + ": Provider '" + provider.getName() + "' spent " + spentTime + "ms");
+                    Log.d(TAG, benchmarkName + ": Provider '" + provider.getName() + "' spent " + spentTime + "ms");
                 } finally {
                     provider.close();
                 }
@@ -66,7 +73,7 @@ public abstract class Benchmark {
 
         @Override
         protected void onPostExecute(Map<String, Long> results) {
-            callback.postResults(getBenchmarkName(), results);
+            callback.postResults(benchmarkName, results);
         }
 
         private long runTest(BaseTest test) {
@@ -77,6 +84,8 @@ public abstract class Benchmark {
     }
 
     public interface Callback {
+        void begin();
+
         void postResults(String benchmarkName, Map<String, Long> results);
     }
 }

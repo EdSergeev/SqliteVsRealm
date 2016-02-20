@@ -85,4 +85,11 @@ public class RealmProvider implements DbProvider {
         }
         return list.size();
     }
+
+    @Override
+    public long deleteGroup(long groupId) {
+        realm.where(RealmStudent.class).equalTo("groupId", groupId).findAll().clear();
+        realm.where(RealmGroup.class).equalTo("groupId", groupId).findAll().clear();
+        return 0;
+    }
 }
