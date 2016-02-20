@@ -35,17 +35,30 @@ public class MainActivity extends AppCompatActivity {
         container = (LinearLayout) findViewById(R.id.content);
         progress = (ContentLoadingProgressBar) findViewById(R.id.progress);
 
-        List<DbProvider> providers = new ArrayList<DbProvider>() {{
-            add(new RealmProvider());
-            add(new SqliteProvider());
-        }};
+        List<DbProvider> providers = createProviders();
+
+        initProviders(providers);
+
+        initBenchmarks(providers);
+    }
+
+    private List<DbProvider> createProviders() {
+        List<DbProvider> providers = new ArrayList<>();
+        providers.add(new RealmProvider());
+        providers.add(new SqliteProvider());
+        return providers;
+    }
+
+    private void initProviders(List<DbProvider> providers) {
         for (DbProvider provider : providers) {
             provider.init(this);
             provider.open();
             provider.clean();
             provider.close();
         }
+    }
 
+    private void initBenchmarks(List<DbProvider> providers) {
         String insertName = String.format("Insert %d items", Config.GROUPS * Config.STUDENTS_PER_GROUP);
         new Benchmark(insertName, providers, benchmarkCallback) {
             @Override
