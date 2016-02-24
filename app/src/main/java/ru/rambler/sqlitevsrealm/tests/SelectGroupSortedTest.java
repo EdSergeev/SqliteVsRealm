@@ -2,15 +2,9 @@ package ru.rambler.sqlitevsrealm.tests;
 
 import ru.rambler.sqlitevsrealm.providers.DbProvider;
 
-public class SelectGroupSortedTest extends BaseTest {
-    public SelectGroupSortedTest(DbProvider provider) {
-        super(provider);
-    }
-
+public class SelectGroupSortedTest implements BaseTest {
     @Override
-    protected void work(DbProvider provider) {
-        provider.begin();
+    public void run(DbProvider provider) {
         provider.selectStudentsByGroupIdAndSort(Config.SELECT_STUDENTS_BY_GROUP_ID);
-        provider.commit();
     }
 }

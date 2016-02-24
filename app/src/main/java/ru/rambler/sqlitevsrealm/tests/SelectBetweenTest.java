@@ -2,15 +2,9 @@ package ru.rambler.sqlitevsrealm.tests;
 
 import ru.rambler.sqlitevsrealm.providers.DbProvider;
 
-public class SelectBetweenTest extends BaseTest {
-    public SelectBetweenTest(DbProvider provider) {
-        super(provider);
-    }
-
+public class SelectBetweenTest implements BaseTest {
     @Override
-    protected void work(DbProvider provider) {
-        provider.begin();
+    public void run(DbProvider provider) {
         provider.selectStudentsBetween(Config.SCORE_FROM, Config.SCORE_TO);
-        provider.commit();
     }
 }

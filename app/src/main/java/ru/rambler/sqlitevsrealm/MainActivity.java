@@ -64,36 +64,36 @@ public class MainActivity extends AppCompatActivity {
         String insertName = String.format("Insert %d items", Config.GROUPS * Config.STUDENTS_PER_GROUP);
         new Benchmark(insertName, providers, benchmarkCallback) {
             @Override
-            protected BaseTest createTest(DbProvider provider) {
-                return new InsertionTest(provider);
+            protected BaseTest createTest() {
+                return new InsertionTest();
             }
         }.begin();
 
         new Benchmark("Select students using 'groupId'", providers, benchmarkCallback) {
             @Override
-            protected BaseTest createTest(DbProvider provider) {
-                return new SelectGroupTest(provider);
+            protected BaseTest createTest() {
+                return new SelectGroupTest();
             }
         }.begin();
 
         new Benchmark("Select students using 'groupId' and sort", providers, benchmarkCallback) {
             @Override
-            protected BaseTest createTest(DbProvider provider) {
-                return new SelectGroupSortedTest(provider);
+            protected BaseTest createTest() {
+                return new SelectGroupSortedTest();
             }
         }.begin();
 
         new Benchmark("Select students using 'between (m,n)'", providers, benchmarkCallback) {
             @Override
-            protected BaseTest createTest(DbProvider provider) {
-                return new SelectBetweenTest(provider);
+            protected BaseTest createTest() {
+                return new SelectBetweenTest();
             }
         }.begin();
 
         new Benchmark("Delete students using groupId", providers, benchmarkCallback) {
             @Override
-            protected BaseTest createTest(DbProvider provider) {
-                return new DeleteGroupTest(provider);
+            protected BaseTest createTest() {
+                return new DeleteGroupTest();
             }
         }.begin();
     }

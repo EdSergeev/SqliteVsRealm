@@ -29,7 +29,7 @@ public abstract class Benchmark {
         this.callback = callback;
     }
 
-    protected abstract BaseTest createTest(DbProvider provider);
+    protected abstract BaseTest createTest();
 
     public void begin() {
         cancel();
@@ -54,14 +54,14 @@ public abstract class Benchmark {
         @Override
         protected Map<String, Long> doInBackground(Void... params) {
             Map<String, Long> results = new HashMap<>(providerList.size());
+            BaseTest test = createTest();
             for (DbProvider provider : providerList) {
                 if (isCancelled()) {
                     break;
                 }
                 provider.open();
                 try {
-                    BaseTest test = createTest(provider);
-                    long spentTime = runTest(test);
+                    long spentTime = runTest(test, provider);
                     results.put(provider.getName(), spentTime);
                     Log.d(TAG, benchmarkName + ": Provider '" + provider.getName() + "' spent " + spentTime + "ms");
                 } finally {
@@ -76,9 +76,14 @@ public abstract class Benchmark {
             callback.postResults(benchmarkName, results);
         }
 
-        private long runTest(BaseTest test) {
+        private long runTest(BaseTest test, DbProvider provider) {
             long startTime = System.currentTimeMillis();
-            test.run();
+            provider.begin();
+            try {
+                test.run(provider);
+            } finally {
+                provider.commit();
+            }
             return System.currentTimeMillis() - startTime;
         }
     }
