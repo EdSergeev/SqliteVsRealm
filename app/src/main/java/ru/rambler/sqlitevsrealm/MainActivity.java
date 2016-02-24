@@ -101,11 +101,17 @@ public class MainActivity extends AppCompatActivity {
     private final Benchmark.Callback benchmarkCallback = new Benchmark.Callback() {
         @Override
         public void begin() {
+            if (isFinishing()) {
+                return;
+            }
             progress.show();
         }
 
         @Override
         public void postResults(String benchmarkName, Map<String, Long> results) {
+            if (isFinishing()) {
+                return;
+            }
             addBenchmarkNameView(benchmarkName);
             if (results.isEmpty()) {
                 return;
